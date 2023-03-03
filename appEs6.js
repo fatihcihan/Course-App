@@ -1,5 +1,6 @@
 class Course {
     constructor(title, instructor, image) {
+        this.courseId = Math.floor(Math.random() * 10000);
         this.title = title;
         this.instructor = instructor;
         this.image = image;
@@ -14,7 +15,7 @@ class UI {
                 <td><img src="img/${course.image}"/></td>
                 <td>${course.title}</td>
                 <td>${course.instructor}</td>
-                <td> <a href="#" class="btn btn-danger btn-sm delete"> Delete </a></td>
+                <td> <a href="#" data-id="${course.courseId}" class="btn btn-danger btn-sm delete"> Delete </a></td>
             </tr>
         `;
         list.innerHTML += html;
@@ -29,6 +30,7 @@ class UI {
     deleteCourse(element) {
         if (element.classList.contains('delete')) {
             element.parentElement.parentElement.remove();
+            return true;
         }
     }
 
@@ -72,8 +74,20 @@ class Storage {
         localStorage.setItem('courses', JSON.stringify(courses));
     }
 
-    static deleteCourse() {
+    static deleteCourse(element) {
+        if (element.classList.contains('delete')) {
+            const id = element.getAttribute('data-id');
+            const courses = Storage.getCourses();
+            courses.forEach((course, index) => {
+                if (course.courseId == id) {
+                    courses.splice(index, 1);
+                }
+            });
 
+            localStorage.setItem('courses', JSON.stringify(courses));
+
+            console.log(id);
+        }
     }
 }
 
@@ -87,6 +101,7 @@ document.getElementById('new-course').addEventListener('submit', function (event
     // create course object
     const course = new Course(title, instructor, image)
 
+    console.log(course);
     // create UI
     const ui = new UI();
 
@@ -112,9 +127,10 @@ document.getElementById('new-course').addEventListener('submit', function (event
 document.getElementById('course-list').addEventListener('click', function (event) {
     const ui = new UI();
     // delete course
-    ui.deleteCourse(event.target);
+    if (ui.deleteCourse(event.target)) {
+        // delete from local storage
+        Storage.deleteCourse(event.target);
+        ui.showAlert('The course has been deleted', 'danger');
+    }
 
-    // delete from local storage
-    Storage.deleteCourse();
-    ui.showAlert('The course has been deleted', 'danger');
 })
