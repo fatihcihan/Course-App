@@ -47,8 +47,39 @@ class UI {
     }
 }
 
-document.getElementById('new-course').addEventListener('submit', function (event) {
+class Storage {
+    static getCourses() {
+        let courses;
+        if (localStorage.getItem('courses') === null) {
+            courses = [];
+        } else {
+            courses = JSON.parse(localStorage.getItem('courses'));
+        }
+        return courses;
+    }
 
+    static displayCourse() {
+        const courses = Storage.getCourses();
+        courses.forEach(course => {
+            const ui = new UI();
+            ui.addCourseToList(course);
+        });
+    }
+
+    static addCourse(course) {
+        const courses = Storage.getCourses();
+        courses.push(course);
+        localStorage.setItem('courses', JSON.stringify(courses));
+    }
+
+    static deleteCourse() {
+
+    }
+}
+
+document.addEventListener('DOMContentLoaded', Storage.displayCourse)
+
+document.getElementById('new-course').addEventListener('submit', function (event) {
     const title = document.getElementById('title').value;
     const instructor = document.getElementById('instructor').value;
     const image = document.getElementById('image').value;
@@ -65,6 +96,9 @@ document.getElementById('new-course').addEventListener('submit', function (event
         // add course to list 
         ui.addCourseToList(course);
 
+        // save to local storage
+        Storage.addCourse(course);
+
         // clear controls
         ui.clearControls();
 
@@ -77,6 +111,10 @@ document.getElementById('new-course').addEventListener('submit', function (event
 
 document.getElementById('course-list').addEventListener('click', function (event) {
     const ui = new UI();
+    // delete course
     ui.deleteCourse(event.target);
+
+    // delete from local storage
+    Storage.deleteCourse();
     ui.showAlert('The course has been deleted', 'danger');
 })
