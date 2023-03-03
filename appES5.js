@@ -30,10 +30,25 @@ UI.prototype.clearControls = function () {
 }
 
 UI.prototype.deleteCourse = function (element) {
-    debugger
     if (element.classList.contains('delete')) {
         element.parentElement.parentElement.remove();
     }
+}
+
+UI.prototype.showAlert = function (message, className) {
+    var alert = `
+        <div class="alert alert-${className}">
+            ${message}
+        </div>
+    `;
+
+    const row = document.querySelector('.row');
+    // beforeBegin, afterBegin, beforeEnd, afterEnd
+    row.insertAdjacentHTML('beforebegin', alert);
+
+    setTimeout(() => {
+        document.querySelector('.alert').remove();
+    }, 3000);
 }
 
 document.getElementById('new-course').addEventListener('submit', function (event) {
@@ -48,11 +63,17 @@ document.getElementById('new-course').addEventListener('submit', function (event
     // create UI
     const ui = new UI();
 
-    // add course to list 
-    ui.addCourseToList(course);
+    if (title === "" || instructor === "" || image === "") {
+        ui.showAlert('Please complete the form', 'warning');
+    } else {
+        // add course to list 
+        ui.addCourseToList(course);
 
-    // clear controls
-    ui.clearControls();
+        // clear controls
+        ui.clearControls();
+
+        ui.showAlert('the course has been added', 'success');
+    }
 
     event.preventDefault();
 });
@@ -61,4 +82,5 @@ document.getElementById('new-course').addEventListener('submit', function (event
 document.getElementById('course-list').addEventListener('click', function (event) {
     const ui = new UI();
     ui.deleteCourse(event.target);
+    ui.showAlert('The course has been deleted', 'danger');
 })
