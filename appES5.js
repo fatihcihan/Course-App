@@ -17,7 +17,7 @@ UI.prototype.addCourseToList = function (course) {
             <td><img src="img/${course.image}"/></td>
             <td>${course.title}</td>
             <td>${course.instructor}</td>
-            <td> <a href="#" class="btn btn-danger btn-sm"> Delete </a></td>
+            <td> <a href="#" class="btn btn-danger btn-sm delete"> Delete </a></td>
         </tr>
     `;
     list.innerHTML += html;
@@ -27,6 +27,13 @@ UI.prototype.clearControls = function () {
     const title = document.getElementById('title').value = "";
     const instructor = document.getElementById('instructor').value = "";
     const image = document.getElementById('image').value = "";
+}
+
+UI.prototype.deleteCourse = function (element) {
+    debugger
+    if (element.classList.contains('delete')) {
+        element.parentElement.parentElement.remove();
+    }
 }
 
 document.getElementById('new-course').addEventListener('submit', function (event) {
@@ -48,4 +55,10 @@ document.getElementById('new-course').addEventListener('submit', function (event
     ui.clearControls();
 
     event.preventDefault();
+});
+
+
+document.getElementById('course-list').addEventListener('click', function (event) {
+    const ui = new UI();
+    ui.deleteCourse(event.target);
 })
